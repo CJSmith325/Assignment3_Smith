@@ -4,24 +4,34 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    //array for values
-    GameObject[,] tileValues = new GameObject[4, 4];
-    public GameObject gridPiece;
+    //arrays for grid deployment/ tile values
+    public GameObject gridPrefab;
+    public GameObject cubePrefab;
+    //GameObject[,] gridPieces = new GameObject[4, 4];
+    int[,] tileValues = new int[4, 4];
     private void Start()
     {
+        int holdX = 0;
+        float holdY = 0;
+        GameObject[,] gridPieces = new GameObject[4, 4] { { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab } };
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
             {
-
-                Instantiate(gridPiece);
-
+                Instantiate(gridPieces[x, y], new Vector3(holdX, holdY, 2.5f), Quaternion.identity);
+                holdX++;
+                holdX++;
             }
+            holdY ++;
+            holdY++;
+            holdX = 0;
         }
     }
 
     private void Update()
     {
+
+
         if (Input.GetKeyDown(KeyCode.W))
         {
 
@@ -42,6 +52,12 @@ public class GameManager : MonoBehaviour
 
         }
     }
+
+    void RandomSpawnTile()
+    {
+
+    }
+
 
     void OnDrawGizmos()
     {
