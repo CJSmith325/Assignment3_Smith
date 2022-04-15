@@ -15,12 +15,22 @@ public class GameManager : MonoBehaviour
     public GameObject cubePrefab;
     // game object array for physical game pieces
     GameObject[,] blocks = new GameObject[4, 4];
+    //gripieces declare
+    GameObject[,] gridPieces = new GameObject[4, 4];
     // int array for text values to be stored/hopefully .parse or .tryparse still works
     int [,] values = new int[4, 4];
     private void Start()
     {
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 4; y++)
+            {
+                gridPieces[x, y] = null;
+            }
+        }
         // reset spawn count
         spawnCount = 0;
+        gridPieces = new GameObject[4, 4] { { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab } };
         // initialize int values array to 0
         for (int x = 0; x < 4; x++)
         {
@@ -29,7 +39,14 @@ public class GameManager : MonoBehaviour
                 values[x, y] = 0;
             }
         }
-
+        // reset gameobject array for actual game blocks
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 4; y++)
+            {
+                blocks[x, y] = null;
+            }
+        }
         //for (int x = 0; x < 4; x++)
         //{
         //    for (int y = 0; y < 4; y++)
@@ -41,7 +58,7 @@ public class GameManager : MonoBehaviour
         int holdX = 0;
         float holdY = 0;
         // grid declaration/initialization of gird prefabs
-        GameObject[,] gridPieces = new GameObject[4, 4] { { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab }, { gridPrefab, gridPrefab, gridPrefab, gridPrefab } };
+        
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
@@ -55,28 +72,33 @@ public class GameManager : MonoBehaviour
             holdY++;
             holdX = 0;
         }
+        RandomBlockSpawn();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.W))
         {
+
             RandomBlockSpawn();
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
 
+            RandomBlockSpawn();
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
 
+            RandomBlockSpawn();
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.D))
         {
 
+            RandomBlockSpawn();
         }
     }
 
