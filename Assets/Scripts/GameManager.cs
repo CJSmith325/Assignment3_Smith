@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     
     // spawn count variable to force 2 tile spawn on start, then 1 tile from then on out
     int spawnCount = 0;
+    // count variable to track # elements in array
+    int countLength = 0;
     // prefab slots for editor
     public GameObject gridPrefab;
     public GameObject cubePrefab;
@@ -140,14 +142,15 @@ public class GameManager : MonoBehaviour
                 rndRow = Random.Range(0, 4);
                 rndCol = Random.Range(0, 4);
                 spawnCount++;
+                countLength++;
             }
             
             if (spawnCount >= 0)
             {
-                //spawn 1 block   
+                // THE BLOWUP IS RIGHT HERE AT THIS WHILE LOOP
+                //spawn 1 block  
                 while (hasSpawned == false)
                 {
-
                     //spawn 1 blocks if cell is not occupied, if not then new rand
                     if (blocks[rndRow, rndCol] == null)
                     {
@@ -176,10 +179,19 @@ public class GameManager : MonoBehaviour
                     }
                     rndRow = Random.Range(0, 4);
                     rndCol = Random.Range(0, 4);
+                    
+                    if (countLength == 16)
+                    {
+                    
+                    SceneManager.LoadScene("GameOver");
+                    break;
+                    }
+                    
                 }
                 hasSpawned = false;
+                // could display as move count in game if have time (-2 for initial spawns)
                 spawnCount++;
-                // could display as move count in game if have time
+                countLength++;
             }
         
         
