@@ -1,13 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
+
+// LINES125-126 for text manipulation
+// keep blocks[,] and values[,] parallel, always manipulate together
 
 public class GameManager : MonoBehaviour
 {
+    //float variable for lerp argument
+    float lerpTime = 4f;
     // bool variable to track if random spawn has proced
     bool hasSpawned = false;
     // bool variable to restrict to one add/subtract per move, default false, true when merged then reset
-    bool hasMerged = false;
+    
     // spawn count variable to force 2 tile spawn on start, then 1 tile from then on out
     int spawnCount = 0;
     // prefab slots for editor
@@ -15,7 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject cubePrefab;
     // game object array for physical game pieces
     GameObject[,] blocks = new GameObject[4, 4];
-    //gripieces declare
+    //gridpieces declare
     GameObject[,] gridPieces = new GameObject[4, 4];
     // int array for text values to be stored/hopefully .parse or .tryparse still works
     int [,] values = new int[4, 4];
@@ -77,25 +85,25 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            PushBlockW();
+            RandomBlockSpawn();
+        }
+
+        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
 
             RandomBlockSpawn();
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-
+            
             RandomBlockSpawn();
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-
-            RandomBlockSpawn();
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
 
             RandomBlockSpawn();
@@ -105,59 +113,131 @@ public class GameManager : MonoBehaviour
     // full logic for spawning random tile based on two rand int generations between 0-3, then check if cell if empty and repeat if not until eligible tile. if no eligible tile, end game
     void RandomBlockSpawn()
     {
-        int rndRow = Random.Range(0, 4);
-        int rndCol = Random.Range(0, 4);
-        if (spawnCount == 0)
-        {
-            while (hasSpawned == false)
+            int rndRow = Random.Range(0, 4);
+            int rndCol = Random.Range(0, 4);
+            if (spawnCount == 0)
             {
-
-                //spawn 1 blocks if cell is not occupied, if not then new rand
-                if (blocks[rndRow, rndCol] == null)
+                while (hasSpawned == false)
                 {
-                    blocks[rndRow, rndCol] = cubePrefab;
-                    Instantiate(blocks[rndRow, rndCol], new Vector3(rndRow * 2, rndCol * 2, 0), Quaternion.identity);
-                    hasSpawned = true;
+
+                    //spawn 1 blocks if cell is not occupied, if not then new rand
+                    if (blocks[rndRow, rndCol] == null)
+                    {
+                        GameObject tempObj = new GameObject();
+                        tempObj = Instantiate(cubePrefab, new Vector3(rndRow * 2, rndCol * 2, 0), Quaternion.identity);
+                        var textValue = tempObj.GetComponentInChildren<TextMeshProUGUI>();
+                        textValue.text = "2";
+                        // || arrays
+                        blocks[rndRow, rndCol] = tempObj;
+                        values[rndRow, rndCol] = 2;
+                        //
+                        hasSpawned = true;
+                    }
+                    rndRow = Random.Range(0, 4);
+                    rndCol = Random.Range(0, 4);
                 }
+                hasSpawned = false;
                 rndRow = Random.Range(0, 4);
                 rndCol = Random.Range(0, 4);
+                spawnCount++;
             }
-            hasSpawned = false;
-            rndRow = Random.Range(0, 4);
-            rndCol = Random.Range(0, 4);
-            spawnCount++;
-        }
-        if (spawnCount >= 0)
-        {
-            //spawn 1 block   
-            while (hasSpawned == false)
+            
+            if (spawnCount >= 0)
             {
-
-                //spawn 1 blocks if cell is not occupied, if not then new rand
-                if (blocks[rndRow, rndCol] == null)
+                //spawn 1 block   
+                while (hasSpawned == false)
                 {
-                    blocks[rndRow, rndCol] = cubePrefab;
-                    Instantiate(blocks[rndRow, rndCol], new Vector3(rndRow * 2, rndCol * 2, 0), Quaternion.identity);
-                    hasSpawned = true;
+
+                    //spawn 1 blocks if cell is not occupied, if not then new rand
+                    if (blocks[rndRow, rndCol] == null)
+                    {
+                        GameObject tempObj = new GameObject();
+                        tempObj = Instantiate(cubePrefab, new Vector3(rndRow * 2, rndCol * 2, 0), Quaternion.identity);
+                        var textValue = tempObj.GetComponentInChildren<TextMeshProUGUI>();
+                        textValue.text = "2";
+                        // || arrays
+                        try
+                        {
+                            blocks[rndRow, rndCol] = tempObj;
+                        }
+                        catch(UnityException ex)
+                        {
+                            SceneManager.LoadScene("GameOver");
+                        }
+                        values[rndRow, rndCol] = 2;
+                        //
+                        Debug.Log(values[rndRow, rndCol]);
+                        hasSpawned = true;
+                        Debug.Log(rndRow);
+                        Debug.Log(rndCol);
+                        TextMeshProUGUI cubeValue = cubePrefab.GetComponentInChildren<TextMeshProUGUI>();
+                        Debug.Log(cubeValue.text.ToString());
+                    }
+                    rndRow = Random.Range(0, 4);
+                    rndCol = Random.Range(0, 4);
                 }
-                rndRow = Random.Range(0, 4);
-                rndCol = Random.Range(0, 4);
+                hasSpawned = false;
+                spawnCount++;
+                // could display as move count in game if have time
             }
-            hasSpawned = false;
-            spawnCount++;
-            // could display as move count in game if have time
-        }
+        
+        
     }
 
     // function for pushing tiles in directions requiring subtracting from index
-    void PushBlockDownIndex()
+    void PushBlockW()
     {
+        GameObject swapObj = new GameObject();
+        int swapInt = 0;
+        float holderX = 0f;
+        float holderY = 0f;
         // look for empty cell, if not, check for merge before swapping cells
+        bool hasMerged = false;
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                if (blocks[x, y] != null)
+                {
+                    if (blocks[x, y + 1] == null)
+                    {
+                        while(blocks[x, y + 1] == null)
+                        { 
+                            //empty cell, simple move
+                            blocks[x, y + 1] = swapObj;
+                            blocks[x, y + 1] = blocks[x, y];
+                            blocks[x, y] = swapObj;
+                            values[x, y + 1] = swapInt;
+                            values[x, y + 1] = values[x, y];
+                            values[x, y] = swapInt;
+                            holderX = x;
+                            holderY = y;
+                            Vector3 vecMove = Vector3.Lerp(new Vector3(holderX * 2, holderY * 2, 0), new Vector3(holderX * 2, (holderY * 2) + 2, 0), lerpTime);
+                            blocks[x, y + 1].transform.position = vecMove;
+                        }
+                    }
+                    if (blocks[x, y + 1] != null)
+                    {
+                        //merge and move
+                        if (hasMerged == false)
+                        {
+
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void PushBlockD()
+    {
+        bool hasMerged = false;
 
     }
 
     // function for pushing tiles in directions requiring adding to index
-    void PushBlockUpIndex()
+    void PushBlockDownIndex()
     {
         // look for empty cell, if not, check for merge before swapping cells
 
