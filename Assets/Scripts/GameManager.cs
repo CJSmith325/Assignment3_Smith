@@ -172,6 +172,7 @@ public class GameManager : MonoBehaviour
                         Debug.Log(rndCol);
                         TextMeshProUGUI cubeValue = cubePrefab.GetComponentInChildren<TextMeshProUGUI>();
                         Debug.Log(cubeValue.text.ToString());
+                        
                     }
                     rndRow = Random.Range(0, 4);
                     rndCol = Random.Range(0, 4);
@@ -204,10 +205,10 @@ public class GameManager : MonoBehaviour
                         while(blocks[x, y + 1] == null)
                         { 
                             //empty cell, simple move
-                            blocks[x, y + 1] = swapObj;
+                            swapObj = blocks[x, y + 1];
                             blocks[x, y + 1] = blocks[x, y];
                             blocks[x, y] = swapObj;
-                            values[x, y + 1] = swapInt;
+                            swapInt = values[x, y + 1];
                             values[x, y + 1] = values[x, y];
                             values[x, y] = swapInt;
                             holderX = x;
