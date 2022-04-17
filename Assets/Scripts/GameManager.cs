@@ -90,25 +90,43 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             PushBlockW();
+            Check2048();
             RandomBlockSpawn();
         }
 
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
         {
-
+            PushBlockA();
+            Check2048();
             RandomBlockSpawn();
         }
 
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
         {
-            
+            PushBlockS();
+            Check2048();
             RandomBlockSpawn();
         }
 
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
         {
-
+            PushBlockD();
+            Check2048();
             RandomBlockSpawn();
+        }
+    }
+
+    void Check2048()
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            for (int y = 0; y < 4; y++)
+            {
+                if (values[x,y] == 2048)
+                {
+                    SceneManager.LoadScene("VictoryScreen");
+                }
+            }
         }
     }
 
@@ -182,7 +200,7 @@ public class GameManager : MonoBehaviour
                     
                     if (countLength == 16)
                     {
-                    
+                    // primitive bug fix
                     SceneManager.LoadScene("GameOver");
                     break;
                     }
@@ -208,14 +226,15 @@ public class GameManager : MonoBehaviour
         bool hasMerged = false;
         for (int x = 0; x < 4; x++)
         {
+            hasMerged = false;
             for (int y = 0; y < 3; y++)
             {
                 if (blocks[x, y] != null)
                 {
                     if (blocks[x, y + 1] == null)
                     {
-                        while(blocks[x, y + 1] == null)
-                        { 
+                        //while (blocks[x, y + 1] == null)
+                        //{
                             //empty cell, simple move
                             swapObj = blocks[x, y + 1];
                             blocks[x, y + 1] = blocks[x, y];
@@ -227,16 +246,104 @@ public class GameManager : MonoBehaviour
                             holderY = y;
                             Vector3 vecMove = Vector3.Lerp(new Vector3(holderX * 2, holderY * 2, 0), new Vector3(holderX * 2, (holderY * 2) + 2, 0), lerpTime);
                             blocks[x, y + 1].transform.position = vecMove;
-                        }
+                        //}
                     }
                     if (blocks[x, y + 1] != null)
                     {
                         //merge and move
                         if (hasMerged == false)
                         {
-
+                            if (values[x, y] == values[x, y + 1])
+                            {
+                                // change scene by updating gameobject array, update and utilize backend values array
+                                int holdAdd;
+                                string strHold;
+                                holdAdd = values[x, y] + values[x, y + 1];
+                                values[x, y + 1] = holdAdd;
+                                strHold = holdAdd.ToString();
+                                TextMeshProUGUI txtHold = blocks[x, y + 1].GetComponentInChildren<TextMeshProUGUI>();
+                                txtHold.text = strHold;
+                                values[x, y] = 0;
+                                
+                                Destroy(blocks[x, y].gameObject);
+                                countLength--;
+                            }                           
+                            hasMerged = true;
+                        }
+                        if (hasMerged == true) 
+                        {
+                            //push +1 block until next index not null
 
                         }
+                        
+                        
+                    }
+                }
+            }
+        }
+    }
+
+    void PushBlockS()
+    {
+        GameObject swapObj = new GameObject();
+        int swapInt = 0;
+        float holderX = 0f;
+        float holderY = 0f;
+        // look for empty cell, if not, check for merge before swapping cells
+        bool hasMerged = false;
+        for (int x = 0; x < 4; x++)
+        {
+            hasMerged = false;
+            for (int y = 3; y > 0; y--)
+            {
+                if (blocks[x, y] != null)
+                {
+                    if (blocks[x, y - 1] == null)
+                    {
+                        //while (blocks[x, y + 1] == null)
+                        //{
+                        //empty cell, simple move
+                        swapObj = blocks[x, y - 1];
+                        blocks[x, y - 1] = blocks[x, y];
+                        blocks[x, y] = swapObj;
+                        swapInt = values[x, y - 1];
+                        values[x, y - 1] = values[x, y];
+                        values[x, y] = swapInt;
+                        holderX = x;
+                        holderY = y;
+                        Vector3 vecMove = Vector3.Lerp(new Vector3(holderX * 2, holderY * 2, 0), new Vector3(holderX * 2, (holderY * 2) - 2, 0), lerpTime);
+                        blocks[x, y - 1].transform.position = vecMove;
+                        //}
+                    }
+                    if (blocks[x, y - 1] != null)
+                    {
+                        //merge and move
+                        if (hasMerged == false)
+                        {
+                            if (values[x, y] == values[x, y - 1])
+                            {
+                                // change scene by updating gameobject array, update and utilize backend values array
+                                int holdAdd;
+                                string strHold;
+                                holdAdd = values[x, y] + values[x, y - 1];
+                                values[x, y - 1] = holdAdd;
+                                strHold = holdAdd.ToString();
+                                TextMeshProUGUI txtHold = blocks[x, y - 1].GetComponentInChildren<TextMeshProUGUI>();
+                                txtHold.text = strHold;
+                                values[x, y] = 0;
+
+                                Destroy(blocks[x, y].gameObject);
+                                countLength--;
+                            }
+                            hasMerged = true;
+                        }
+                        if (hasMerged == true)
+                        {
+                            //push +1 block until next index not null
+
+                        }
+
+
                     }
                 }
             }
@@ -245,28 +352,150 @@ public class GameManager : MonoBehaviour
 
     void PushBlockD()
     {
-        bool hasMerged = false;
-
-    }
-
-    // function for pushing tiles in directions requiring adding to index
-    void PushBlockDownIndex()
-    {
+        GameObject swapObj = new GameObject();
+        int swapInt = 0;
+        float holderX = 0f;
+        float holderY = 0f;
         // look for empty cell, if not, check for merge before swapping cells
-
-    }
-
-    // visual aid in scene editor
-    void OnDrawGizmos()
-    {
-        for (int x = 0; x < 4; x++)
+        bool hasMerged = false;
+        for (int y = 0; y < 4; y++)
         {
-            for (int y = 0; y < 4; y++)
+            hasMerged = false;
+            for (int x = 0; x < 3; x++)
             {
-                
-                Gizmos.DrawWireCube(new Vector2(2 * x, 2 * y), new Vector2(1.25f, 1.25f));
-                
+                if (blocks[x, y] != null)
+                {
+                    if (blocks[x+1, y] == null)
+                    {
+                        //while (blocks[x, y + 1] == null)
+                        //{
+                        //empty cell, simple move
+                        swapObj = blocks[x+1, y];
+                        blocks[x+1, y] = blocks[x, y];
+                        blocks[x, y] = swapObj;
+                        swapInt = values[x+1, y];
+                        values[x+1, y] = values[x, y];
+                        values[x, y] = swapInt;
+                        holderX = x;
+                        holderY = y;
+                        Vector3 vecMove = Vector3.Lerp(new Vector3(holderX * 2, holderY * 2, 0), new Vector3((holderX * 2) + 2, (holderY * 2), 0), lerpTime);
+                        blocks[x+1, y].transform.position = vecMove;
+                        //}
+                    }
+                    if (blocks[x+1, y] != null)
+                    {
+                        //merge and move
+                        if (hasMerged == false)
+                        {
+                            if (values[x, y] == values[x+1, y])
+                            {
+                                // change scene by updating gameobject array, update and utilize backend values array
+                                int holdAdd;
+                                string strHold;
+                                holdAdd = values[x, y] + values[x+1, y];
+                                values[x+1, y] = holdAdd;
+                                strHold = holdAdd.ToString();
+                                TextMeshProUGUI txtHold = blocks[x+1, y].GetComponentInChildren<TextMeshProUGUI>();
+                                txtHold.text = strHold;
+                                values[x, y] = 0;
+
+                                Destroy(blocks[x, y].gameObject);
+                                countLength--;
+                            }
+                            hasMerged = true;
+                        }
+                        if (hasMerged == true)
+                        {
+                            //push +1 block until next index not null
+
+                        }
+
+
+                    }
+                }
             }
         }
     }
+
+    void PushBlockA()
+    {
+        // look for empty cell, if not, check for merge before swapping cells
+        GameObject swapObj = new GameObject();
+        int swapInt = 0;
+        float holderX = 0f;
+        float holderY = 0f;
+        // look for empty cell, if not, check for merge before swapping cells
+        bool hasMerged = false;
+        for (int y = 0; y < 4; y++)
+        {
+            hasMerged = false;
+            for (int x = 3; x > 0; x--)
+            {
+                if (blocks[x, y] != null)
+                {
+                    if (blocks[x - 1, y] == null)
+                    {
+                        //while (blocks[x, y + 1] == null)
+                        //{
+                        //empty cell, simple move
+                        swapObj = blocks[x - 1, y];
+                        blocks[x - 1, y] = blocks[x, y];
+                        blocks[x, y] = swapObj;
+                        swapInt = values[x - 1, y];
+                        values[x - 1, y] = values[x, y];
+                        values[x, y] = swapInt;
+                        holderX = x;
+                        holderY = y;
+                        Vector3 vecMove = Vector3.Lerp(new Vector3(holderX * 2, holderY * 2, 0), new Vector3((holderX * 2) - 2, (holderY * 2), 0), lerpTime);
+                        blocks[x - 1, y].transform.position = vecMove;
+                        //}
+                    }
+                    if (blocks[x - 1, y] != null)
+                    {
+                        //merge and move
+                        if (hasMerged == false)
+                        {
+                            if (values[x, y] == values[x - 1, y])
+                            {
+                                // change scene by updating gameobject array, update and utilize backend values array
+                                int holdAdd;
+                                string strHold;
+                                holdAdd = values[x, y] + values[x - 1, y];
+                                values[x - 1, y] = holdAdd;
+                                strHold = holdAdd.ToString();
+                                TextMeshProUGUI txtHold = blocks[x - 1, y].GetComponentInChildren<TextMeshProUGUI>();
+                                txtHold.text = strHold;
+                                values[x, y] = 0;
+
+                                Destroy(blocks[x, y].gameObject);
+                                countLength--;
+                            }
+                            hasMerged = true;
+                        }
+                        if (hasMerged == true)
+                        {
+                            //push +1 block until next index not null
+
+                        }
+
+
+                    }
+                }
+            }
+        }
+    }
+
+    // visual aid in scene editor
+    //void OnDrawGizmos()
+    //{
+    //    for (int x = 0; x < 4; x++)
+    //    {
+    //        for (int y = 0; y < 4; y++)
+    //        {
+                
+    //            Gizmos.DrawWireCube(new Vector2(2 * x, 2 * y), new Vector2(1.25f, 1.25f));
+                
+    //        }
+    //    }
+    //}
 }
